@@ -1,11 +1,14 @@
 ﻿using System;
 using Atata;
 using NUnit.Framework;
+using GoogleTestUI.Supports;
 
 namespace GoogleTestUI.Components
 {
     public class UITests1 : UITestFixture
     {
+        Support tr = new Support();
+        String path = @"C:\Users\gianglt\Desktop\ExampleTest.json";
         [Test]
         [Category("VerifySearchFunction")]
         public void HandleSearchGoogle()
@@ -21,7 +24,7 @@ namespace GoogleTestUI.Components
         public void HandleSearchFacebook()
         {
             Go.To<GooglePage>().
-                TxtSearch.Set("Facebook").
+                TxtSearch.Set(tr.GetJsonData("SearchValue", path)).
                 Wait(10).BtnSearch2.Click().
                 Wait(10).LnkFacebook.Exists();
         }

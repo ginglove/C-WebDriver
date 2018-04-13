@@ -33,6 +33,7 @@ namespace GoogleTestUI.Supports
         {
             StreamReader rd = File.OpenText(path);
             string json = rd.ReadToEnd();
+            string a = "";
             //JsonTextReader reader = new JsonTextReader(new StringReader(json));
             JArray parsedArray = JArray.Parse(json);
             foreach (JObject parsedObject in parsedArray.Children<JObject>())
@@ -44,11 +45,12 @@ namespace GoogleTestUI.Supports
                     {
                         string propertyValue = (string)parsedProperty.Value;
                         //Console.WriteLine("Name: {0}, Value: {1}", propertyName, propertyValue);
-                        Console.WriteLine(propertyName);
+                        Console.WriteLine(propertyValue);
+                        a = propertyValue;
                     }
                 }
             }
-            return keyname;
+            return a;
         }
     }
 }

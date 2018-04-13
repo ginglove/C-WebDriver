@@ -12,7 +12,7 @@ namespace GoogleTestUI.Supports
         {
             Support tr = new Support();
             String path= @"C:\Users\gianglt\Desktop\ExampleTest.json";
-            string a = "AuthenticateCmdlets";
+            string a = "SearchValue";
             string Data=tr.GetJsonData(a, path);
             Console.Write(Data);
             Console.ReadLine();
