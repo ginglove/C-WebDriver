@@ -29,12 +29,7 @@ namespace GoogleTestUI.Supports
             }
             Console.ReadLine();
         }
-        public static T ParseJsonObject<T>(string json) where T : class, new()
-        {
-            JObject jobject = JObject.Parse(json);
-            return JsonConvert.DeserializeObject<T>(jobject.ToString());
-        }
-        public void GetJsonData(string keyname,string path)
+        public string GetJsonData(string keyname,string path)
         {
             StreamReader rd = File.OpenText(path);
             string json = rd.ReadToEnd();
@@ -48,11 +43,12 @@ namespace GoogleTestUI.Supports
                     if (propertyName.Equals(keyname))
                     {
                         string propertyValue = (string)parsedProperty.Value;
-                        Console.WriteLine("Name: {0}, Value: {1}", propertyName, propertyValue);
+                        //Console.WriteLine("Name: {0}, Value: {1}", propertyName, propertyValue);
+                        Console.WriteLine(propertyName);
                     }
                 }
             }
-            Console.ReadLine();
+            return keyname;
         }
     }
 }
