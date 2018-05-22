@@ -1,0 +1,152 @@
+        public void HandleDownloadZip1Image(JsonTemp_ImageLibrary j, string ImageID)
+        {
+            IWebDriver driver = AtataContext.Current.Driver;
+            string Xpath = "//a[@class='thumbnail' and @data-parent-id='" + ImageID + "' ]//ancestor::li//div[@class='file-name-label']";
+            string ImageName = driver.FindElement(By.XPath(Xpath)).Text;
+            RightClickToImage(j, ImageID);
+            ClickElement("//ul[@id='contextMenu']//a[contains(@class,'context-download')]", 50000);
+            string time = DateTime.Now.ToString("mm-ss");
+            string FolderDownload = j.DownloadFolder;
+            Console.WriteLine("Start Handle Zip");
+            var files = new DirectoryInfo(FolderDownload).GetFiles("*.*");
+            string latestfile = "";
+            DateTime latestupdate = DateTime.MinValue;
+            foreach (FileInfo file in files)
+            {
+                if (file.LastWriteTime > latestupdate)
+                {
+                    latestupdate = file.LastWriteTime;
+                    latestfile = file.Name;
+                }
+            }
+            Console.WriteLine("Latest file : {0}", latestfile);
+            HandleDownLoadZip(ImageName, j.ExtractFolder, latestfile, FolderDownload);
+        }
+        public void HandleDownloadZipMoreImage(JsonTemp_ImageLibrary j)
+        {
+            IWebDriver driver = AtataContext.Current.Driver;
+            ClickElement("//ul[@id='contextMenuCollection']//li[contains(@class,'download-all-collection')]", 50000);
+            string FolderDownload = j.DownloadFolder;
+            Console.WriteLine("Start Handle Zip");
+            var files = new DirectoryInfo(FolderDownload).GetFiles("*.*");
+            string latestfile = "";
+            DateTime latestupdate = DateTime.MinValue;
+            foreach (FileInfo file in files)
+            {
+                if (file.LastWriteTime > latestupdate)
+                {
+                    latestupdate = file.LastWriteTime;
+                    latestfile = file.Name;
+                }
+            }
+            Console.WriteLine("Latest file : {0}", latestfile);
+            IList<IWebElement> element = driver.FindElements(By.XPath("//div[@class='inspector-thumbnails-container medium-thumbs']//ancestor::li//div[@class='file-name-label']"));
+            for (int i = 0; i < element.Count; i++)
+            {
+                string Imagename = element[i].Text;
+                HandleDownLoadZip(Imagename, j.ExtractFolder, latestfile, FolderDownload);
+            }
+        }
+        public void HandleDownLoadFile(string XPathName, string XpathDownload, string FolderPath)
+        {
+            IWebDriver driver = AtataContext.Current.Driver;
+            string name = driver.FindElement(By.XPath(XPathName)).Text;
+            //string Datetime = DateTime.Now.ToString("yyyy-MM-dd");
+            //string time = DateTime.Now.ToString("mm-ss");
+            ClickElement(XpathDownload, 20000);
+            string DownloadPath = FolderPath;
+            string Imagename = FolderPath + name;
+            try
+            {
+                if (Directory.Exists(DownloadPath))
+                {
+                    bool result = CheckFile(Imagename);
+                    if (result == true)
+                    {
+                        Console.WriteLine("Download file existed");
+                        DeleteFiles(Imagename);
+                    }
+                }
+            }
+            catch (FileNotFoundException e)
+            {
+                Console.WriteLine("File not found exception :{0}", e.Message);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception is :{0}", e.Message);
+            }
+        }
+        public void HandleDownLoadZip(string ImageName, string ExtractFolder, string zipname, string DownloadPath)
+        {
+            IWebDriver driver = AtataContext.Current.Driver;
+            string ExtractPath = ExtractFolder + "\\";
+            string Zipname = DownloadPath + "\\" + zipname;
+            string ImageExtractPath = ExtractPath + ImageName;
+            bool resultzip = CheckFile(Zipname);
+            if (resultzip == true)
+            {
+                ExtractFiles(ImageExtractPath, Zipname, ExtractPath);
+            }
+            if (IsDirectoryEmpty(ExtractPath) == true)
+            {
+                DeleteFiles(Zipname);
+            }
+        }       
+  /*     public void HandleDownLoadZipWithMoreFile(string ImageName, string ExtractFolder, string zipname, string DownloadPath)
+        {
+            IWebDriver driver = AtataContext.Current.Driver;
+            string ExtractPath = ExtractFolder + "\\";
+            string Zipname = DownloadPath + "\\" + zipname;
+            string ImageExtractPath = ExtractPath + ImageName;
+            bool resultzip = CheckFile(Zipname);
+            if (resultzip == true)
+            {
+                ExtractFiles(ImageExtractPath, Zipname, ExtractPath);
+            }
+            if(IsDirectoryEmpty(ExtractPath)==true)
+            {
+                DeleteFiles(Zipname);
+            }           
+        }*/
+        public void ExtractFiles(string imageZipFile, string zipFile, string ExtractFolder)
+        {
+            string newExtractFolder = ExtractFolder;
+            if(IsDirectoryEmpty(ExtractFolder)==true)
+            {
+                ZipFile.ExtractToDirectory(zipFile, newExtractFolder);
+            }
+            else { }
+            bool resultImageZip = CheckFile(imageZipFile);
+            if (resultImageZip == true)
+            {
+                Console.WriteLine("Extract file existed");
+                DeleteFiles(imageZipFile);
+            }
+        }
+
+        public bool IsDirectoryEmpty(string path)
+        {
+            string[] dirs = System.IO.Directory.GetDirectories(path); string[] files = System.IO.Directory.GetFiles(path);
+            return dirs.Length == 0 && files.Length == 0;
+        }
+
+        public bool CheckFile(string currentPath)
+        {
+            if (File.Exists(currentPath)) 
+            {
+                return true; 
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public void DeleteFiles(string file)
+        {
+            if (File.Exists(file))
+            {
+                File.Delete(file);
+                Console.WriteLine("Delete successful");
+            }
+        }
